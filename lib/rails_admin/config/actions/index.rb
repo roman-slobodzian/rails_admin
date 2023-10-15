@@ -21,6 +21,17 @@ module RailsAdmin
         end
 
         register_instance_option :breadcrumb_parent do
+          if bindings[:controller].params[:owner_model_name] && bindings[:abstract_model].try(:config).try(:owner_relation)
+            actions = RailsAdmin::Config::Actions.all(
+              :all,
+              controller: bindings[:controller], abstract_model: bindings[:controller].owner_abstract_model,
+              object: bindings[:controller].owner_object
+            ).to_h { |action| [action.key, action] }
+            next [:show, bindings[:controller].owner_abstract_model, bindings[:controller].owner_object] if actions[:show]
+            next [:edit, bindings[:controller].owner_abstract_model, bindings[:controller].owner_object] if actions[:edit]
+            next [:list, bindings[:controller].owner_abstract_model] if actions[:list]
+          end
+
           parent_model = bindings[:abstract_model].try(:config).try(:parent)
           am = parent_model && RailsAdmin.config(parent_model).try(:abstract_model)
           if am

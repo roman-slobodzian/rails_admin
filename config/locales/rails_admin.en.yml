@@ -74,11 +74,13 @@ en:
         title: "List of %{model_label_plural}"
         menu: "List"
         breadcrumb: "%{model_label_plural}"
+        owner_breadcrumb: "%{model_label_plural}"
         no_records: "No records found"
       show:
         title: "Details for %{model_label} '%{object_label}'"
         menu: "Show"
         breadcrumb: "%{object_label}"
+        owner_breadcrumb: "%{object_label}"
       show_in_app:
         menu: "Show in app"
       new:
@@ -91,6 +93,7 @@ en:
         title: "Edit %{model_label} '%{object_label}'"
         menu: "Edit"
         breadcrumb: "Edit"
+        owner_breadcrumb: "%{object_label}"
         link: "Edit this %{model_label}"
         done: "updated"
       delete:

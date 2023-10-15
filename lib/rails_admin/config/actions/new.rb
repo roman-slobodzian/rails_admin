@@ -28,6 +28,7 @@ module RailsAdmin
                 sanitize_params_for!(request.xhr? ? :modal : :create)
                 @object.assign_attributes(@object.attributes.merge(object_params.to_h))
               end
+              assign_owner_relation
               respond_to do |format|
                 format.html { render @action.template_name }
                 format.js   { render @action.template_name, layout: 'rails_admin/modal', content_type: Mime[:html].to_s }
@@ -40,6 +41,7 @@ module RailsAdmin
               sanitize_params_for!(request.xhr? ? :modal : :create)
 
               @object.assign_attributes(params[@abstract_model.param_key])
+              assign_owner_relation
               @authorization_adapter&.authorize(:create, @abstract_model, @object)
 
               if @object.save

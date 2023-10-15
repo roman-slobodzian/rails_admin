@@ -21,7 +21,7 @@ module RailsAdmin
 
               if @objects.blank?
                 flash[:error] = t('admin.flash.error', name: pluralize(0, @model_config.label), action: t('admin.actions.delete.done'))
-                redirect_to index_path
+                redirect_to url_for(action: :index)
               else
                 render @action.template_name
               end

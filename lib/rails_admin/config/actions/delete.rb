@@ -36,7 +36,7 @@ module RailsAdmin
               @auditing_adapter&.delete_object(@object, @abstract_model, _current_user)
               if @object.destroy
                 flash[:success] = t('admin.flash.successful', name: @model_config.label, action: t('admin.actions.delete.done'))
-                redirect_to index_path
+                redirect_to url_for(action: :index)
               else
                 handle_save_error :delete
               end

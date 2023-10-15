@@ -116,6 +116,8 @@ module RailsAdmin
       def sort_scope(scope, options)
         direction = options[:sort_reverse] ? :asc : :desc
         case options[:sort]
+        when Proc
+          scope.reorder(Arel.sql(options[:sort].call(direction)))
         when String, Symbol
           scope.reorder("#{options[:sort]} #{direction}")
         when Array
