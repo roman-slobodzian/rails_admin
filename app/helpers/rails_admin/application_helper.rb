@@ -68,14 +68,15 @@ module RailsAdmin
       action = RailsAdmin::Config::Actions.find(action.to_sym) if action.is_a?(Symbol) || action.is_a?(String)
 
       key =
-        if params[:owner_model_name] && abstract_model.try(:to_param) == params[:owner_model_name]
+        if params[:owner_model_name] && abstract_model.to_param == params[:owner_model_name]
           "admin.actions.#{action.i18n_key}.owner_#{label}"
         else
           "admin.actions.#{action.i18n_key}.#{label}"
         end
 
       I18n.t(
-        key,
+        "#{abstract_model.to_param}.#{key}",
+        default: [key.to_sym],
         model_label: model_config&.label,
         model_label_plural: model_config&.label_plural,
         object_label: model_config && object.try(model_config.object_label_method),
