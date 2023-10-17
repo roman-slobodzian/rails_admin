@@ -173,7 +173,7 @@ module RailsAdmin
     def menu_for(parent, abstract_model = nil, object = nil, only_icon = false)
       actions = actions(parent, abstract_model, object).select { |a| a.http_methods.include?(:get) && a.show_in_menu }
       items = actions.collect do |action|
-        child_menu_item_for(action, parent, only_icon) do
+        menu_item_for(action, parent, only_icon) do
           rails_admin.url_for(
             action: action.action_name, controller: 'rails_admin/main', model_name: abstract_model.try(:to_param),
             id: (object.try(:persisted?) && object.try(:id) || nil),
@@ -181,23 +181,22 @@ module RailsAdmin
           )
         end
       end
-      items.concat(child_models_menu_for(abstract_model, object, only_icon)) if parent == :member
+      items.prepend(child_models_menu_for(abstract_model, object, only_icon)) if parent == :member
 
       items.join(' ').html_safe
     end
 
     def child_models_menu_for(owner_abstract_model, owner, only_icon)
-      return [] unless owner_abstract_model.config.try(:owned_relations)
-
-      owner_abstract_model.config.owned_relations.map do |relation_name|
-        child_model = owner.class.reflections[relation_name.to_s].klass
+      owner_abstract_model.config.owned_relations_config.map do |relation_config|
+        child_model = owner.class.reflections[relation_config[:name].to_s].klass
         abstract_model = RailsAdmin.config(child_model.name).abstract_model
         # TODO, for now only "index" is supported. But we can make it configurable
         allowed_actions = %i[index]
         actions = actions(:collection, abstract_model).select { |action| action.key.in?(allowed_actions) }
 
         actions.map do |action|
-          child_menu_item_for(action, :collection, only_icon) do
+          wording ||= wording_for(:owned_menu, action, abstract_model)
+          menu_item_for(action, :collection, only_icon, icon: relation_config[:icon], wording: wording) do
             rails_admin.url_for(
               action: action.action_name, controller: 'rails_admin/scoped',
               model_name: abstract_model.try(:to_param),
@@ -209,19 +208,14 @@ module RailsAdmin
       end.flatten
     end
 
-    def child_menu_item_for(action, parent, only_icon)
-      wording = wording_for(:menu, action)
+    def menu_item_for(action, parent, only_icon, icon: nil, wording: nil)
+      wording ||= wording_for(:menu, action)
       li_class = ['nav-item', 'icon', "#{action.key}_#{parent}_link"].
         concat(action.enabled? ? [] : ['disabled'])
       content_tag(:li, {class: li_class}.merge(only_icon ? {title: wording, rel: 'tooltip'} : {})) do
-        label = content_tag(:i, '', {class: action.link_icon}) + ' ' + content_tag(:span, wording, (only_icon ? {style: 'display:none'} : {}))
+        label = content_tag(:i, '', {class: icon || action.link_icon}) + ' ' + content_tag(:span, wording, (only_icon ? {style: 'display:none'} : {}))
         if action.enabled? || !only_icon
-          href =
-            if action.enabled?
-              yield
-            else
-              'javascript:void(0)'
-            end
+          href = action.enabled? ? yield : 'javascript:void(0)'
           content_tag(:a, label, {href: href, target: action.link_target, class: ['nav-link', current_action?(action) && 'active', !action.enabled? && 'disabled'].compact}.merge(action.turbo? ? {} : {data: {turbo: 'false'}}))
         else
           content_tag(:span, label)

@@ -75,6 +75,7 @@ en:
         menu: "List"
         breadcrumb: "%{model_label_plural}"
         owner_breadcrumb: "%{model_label_plural}"
+        owned_menu: "%{model_label_plural}"
         no_records: "No records found"
       show:
         title: "Details for %{model_label} '%{object_label}'"

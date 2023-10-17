@@ -23,7 +23,7 @@ module RailsAdmin
       include RailsAdmin::Config::Sections
       include RailsAdmin::Config::Inspectable
 
-      attr_reader :abstract_model, :parent, :root
+      attr_reader :abstract_model, :parent, :root, :owned_relations_config
       attr_accessor :groups
 
       NAMED_INSTANCE_VARIABLES = %i[@parent @root].freeze
@@ -31,6 +31,7 @@ module RailsAdmin
       def initialize(entity)
         @parent = nil
         @root = self
+        @owned_relations_config = []
 
         @abstract_model =
           case entity
@@ -110,8 +111,8 @@ module RailsAdmin
         abstract_model.model.last.try(:created_at) if abstract_model.properties.detect { |c| c.name == :created_at }
       end
 
-      register_instance_option :owned_relations do
-        []
+      def add_owned_relation(relation, icon: nil)
+        @owned_relations_config << {name: relation, icon: icon}
       end
 
       # Act as a proxy for the base section configuration that actually
