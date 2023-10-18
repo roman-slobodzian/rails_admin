@@ -69,7 +69,7 @@ module RailsAdmin
                   end
 
                 if params[:send_data]
-                  send_data output, filename: "#{instance_eval(&@action.export_filename)}.json"
+                  send_data output, filename: "#{model_config.export.with(controller: self).filename}.json"
                 else
                   render json: output, root: false
                 end
@@ -78,7 +78,7 @@ module RailsAdmin
               format.xml do
                 output = @objects.to_xml(@schema)
                 if params[:send_data]
-                  send_data output, filename: "#{instance_eval(&@action.export_filename)}.xml"
+                  send_data output, filename: "#{model_config.export.with(controller: self).filename}.xml"
                 else
                   render xml: output
                 end
