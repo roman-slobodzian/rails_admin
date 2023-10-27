@@ -14,7 +14,12 @@ module RailsAdmin
           end
 
           register_instance_option :enum do
-            abstract_model.model.defined_enums[name.to_s]
+            abstract_model.model.defined_enums[name.to_s].to_h do |key|
+              [
+                I18n.t("admin.models.#{abstract_model.to_param}.enums.#{name}.#{key}", default: key),
+                key,
+              ]
+            end
           end
 
           register_instance_option :pretty_value do

@@ -69,14 +69,14 @@ module RailsAdmin
 
       key =
         if params[:owner_model_name] && abstract_model.to_param == params[:owner_model_name]
-          "admin.actions.#{action.i18n_key}.owner_#{label}"
+          "#{action.i18n_key}.owner_#{label}"
         else
-          "admin.actions.#{action.i18n_key}.#{label}"
+          "#{action.i18n_key}.#{label}"
         end
 
       I18n.t(
-        "#{abstract_model.to_param}.#{key}",
-        default: [key.to_sym],
+        "admin.models.#{abstract_model.to_param}.actions.#{key}",
+        default: ["admin.actions.#{key}".to_sym],
         model_label: model_config&.label,
         model_label_plural: model_config&.label_plural,
         object_label: model_config && object.try(model_config.object_label_method),
