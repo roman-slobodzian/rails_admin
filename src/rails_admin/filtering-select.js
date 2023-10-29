@@ -51,6 +51,14 @@ import I18n from "./i18n";
       this._overloadRenderItem();
       this._autocompleteDropdownEvent(this.button);
 
+      if (!$.isEmptyObject(this.options.scopeBy)) {
+        this._parentRelationInputs().forEach((el) => {
+          $(el).on('change', this._clearValue.bind(this))
+        })
+
+        if (!this._areParentInputsFilled()) this._syncSelectDisable()
+      }
+
       return this.filtering_select
         .append(this.input)
         .append(this.button)
@@ -164,6 +172,8 @@ import I18n from "./i18n";
       var self = this;
 
       return element.click(function () {
+        if (self.input.prop('disabled')) return;
+
         // close if already visible
         if (self.input.autocomplete("widget").is(":visible")) {
           self.input.autocomplete("close");
@@ -292,6 +302,58 @@ import I18n from "./i18n";
           .append($("<a></a>").html(item.html || item.id))
           .appendTo(ul);
       };
+    },
+
+    _clearValue() {
+      this.input.val("");
+      this.input.change();
+      this.element.html(
+        $('<option value="" selected="selected"></option>')
+      );
+      this._syncSelectDisable()
+    },
+
+    _syncSelectDisable() {
+      if (this._areParentInputsFilled()) {
+        this._enableSelect()
+      } else {
+        this._disableSelect()
+      }
+    },
+
+    async _enableSelect() {
+      await this._selectFirstOption();
+      this.input.prop('disabled', false);
+      this.button.find('.btn').removeClass('disabled');
+    },
+
+    _disableSelect() {
+      this.input.prop('disabled', true);
+      this.button.find('.btn').addClass('disabled');
+    },
+
+    _selectFirstOption: async function () {
+      const results = await new Promise((resolve, reject) => {
+        this._getSourceFunction(this.options.source).call(this, {term: ""}, resolve);
+      });
+
+      const result = results[0];
+
+      if (result) {
+        this.input.val(result.value);
+        this.input.change();
+        this.element.html(`<option value="${result.id}" selected="selected"></option>`);
+      }
+    },
+
+    _parentRelationInputs() {
+      return $.map(this.options.scopeBy, (targetField, field) => {
+        return $(`[name$="[${field}]"]`)
+      })
+    },
+
+    _areParentInputsFilled() {
+      return this._parentRelationInputs().every((el) => el.val())
     },
 
     destroy: function () {
