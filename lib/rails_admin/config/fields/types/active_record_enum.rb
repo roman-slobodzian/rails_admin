@@ -40,29 +40,12 @@ module RailsAdmin
             abstract_model.model.attribute_types[name.to_s].serialize(value)
           end
 
-          def parse_input(params)
-            value = params[name]
-            return unless value
-
-            params[name] = parse_input_value(value)
-          end
-
           def form_value
             enum[super] || super
           end
 
           def translate_enum(name, key)
             I18n.t("admin.models.#{abstract_model.to_param}.enums.#{name}.#{key}", default: key)
-          end
-
-        private
-
-          def parse_input_value(value)
-            abstract_model.model.attribute_types[name.to_s].deserialize(value)
-          end
-
-          def type_cast_value(value)
-            abstract_model.model.column_types[name.to_s].type_cast_from_user(value)
           end
         end
       end
