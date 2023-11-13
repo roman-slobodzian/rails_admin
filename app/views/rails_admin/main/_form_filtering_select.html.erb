@@ -13,7 +13,8 @@
   js_data = {
     xhr: xhr,
     remote_source: index_path(config.abstract_model.to_param, source_object_id: form.object.id, source_abstract_model: source_abstract_model.to_param, associated_collection: field.name, current_action: current_action, compact: true, **field.remote_source_params),
-    scopeBy: field.dynamic_scope_relationships
+    scopeBy: field.dynamic_scope_relationships,
+    autoSelectFirstOption: field.auto_select_first_option
   }
 %>
 

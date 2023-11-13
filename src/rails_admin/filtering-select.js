@@ -13,6 +13,7 @@ import I18n from "./i18n";
       remote_source: null,
       source: null,
       xhr: false,
+      autoSelectFirstOption: false,
     },
 
     button: null,
@@ -322,7 +323,7 @@ import I18n from "./i18n";
     },
 
     async _enableSelect() {
-      await this._selectFirstOption();
+      if (this.options.autoSelectFirstOption) await this._selectFirstOption();
       this.input.prop('disabled', false);
       this.button.find('.btn').removeClass('disabled');
     },

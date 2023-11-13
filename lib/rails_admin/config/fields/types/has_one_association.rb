@@ -27,6 +27,10 @@ module RailsAdmin
             {}
           end
 
+          register_instance_option :auto_select_first_option do
+            false
+          end
+
           def selected_id
             value.try(:id).try(:to_s)
           end
