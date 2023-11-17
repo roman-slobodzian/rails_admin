@@ -474,6 +474,7 @@ RSpec.describe RailsAdmin::MainController, type: :controller do
   describe 'back_or_index' do
     before do
       allow(controller).to receive(:index_path).and_return(index_path)
+      allow(controller).to receive(:url_for).with(action: :index).and_return(index_path)
     end
 
     let(:index_path) { '/' }
