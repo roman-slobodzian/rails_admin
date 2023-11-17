@@ -44,7 +44,7 @@ module RailsAdmin
               assign_owner_relation
               @authorization_adapter&.authorize(:create, @abstract_model, @object)
 
-              if @object.save
+              if @model_config.creator_service.with(object: @object).execute
                 @auditing_adapter&.create_object(@object, @abstract_model, _current_user)
                 respond_to do |format|
                   format.html { redirect_to_on_success }
