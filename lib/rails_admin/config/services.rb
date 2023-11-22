@@ -9,3 +9,4 @@ end
 
 require 'rails_admin/config/services/base'
 require 'rails_admin/config/services/save'
+require 'rails_admin/config/services/destroy'

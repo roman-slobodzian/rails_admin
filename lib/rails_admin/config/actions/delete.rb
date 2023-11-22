@@ -34,7 +34,7 @@ module RailsAdmin
             elsif request.delete? # DESTROY
 
               @auditing_adapter&.delete_object(@object, @abstract_model, _current_user)
-              if @object.destroy
+              if @model_config.destroyer_service.with(object: @object).execute
                 flash[:success] = t('admin.flash.successful', name: @model_config.label, action: t('admin.actions.delete.done'))
                 redirect_to url_for(action: :index)
               else

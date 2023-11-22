@@ -46,7 +46,9 @@ module RailsAdmin
       end
 
       def destroy(objects)
-        Array.wrap(objects).each(&:destroy)
+        Array.wrap(objects).each do |object|
+          config.destroyer_service.with(object: object).execute
+        end
       end
 
       def associations

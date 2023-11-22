@@ -124,12 +124,20 @@ module RailsAdmin
         saver_service_class
       end
 
+      register_instance_option :destroyer_service_class do
+        RailsAdmin::Config::Services::Destroy
+      end
+
       def creator_service
         @creator_service ||= creator_service_class.new
       end
 
       def updater_service
         @updater_service ||= updater_service_class.new
+      end
+
+      def destroyer_service
+        @destroyer_service ||= destroyer_service_class.new
       end
 
       def add_owned_relation(relation, icon: nil)
