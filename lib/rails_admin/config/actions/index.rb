@@ -44,6 +44,8 @@ module RailsAdmin
         register_instance_option :controller do
           proc do
             @objects ||= list_entries
+            list_section = @model_config.list.with(controller: self)
+            @objects = list_section.instance_exec(@objects, &list_section.scope)
 
             unless @model_config.list.scopes.empty?
               if params[:scope].blank?

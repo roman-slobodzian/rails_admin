@@ -42,6 +42,10 @@ module RailsAdmin
           []
         end
 
+        register_instance_option :scope do
+          proc { |query| query }
+        end
+
         register_instance_option :row_css_class do
           ''
         end
