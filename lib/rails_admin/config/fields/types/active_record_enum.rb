@@ -15,13 +15,13 @@ module RailsAdmin
 
           register_instance_option :enum do
             abstract_model.model.defined_enums[name.to_s].to_h do |key|
-              [translate_enum(name, key), key]
+              [translate_enum(key), key]
             end
           end
 
           register_instance_option :pretty_value do
             value = bindings[:object].send(name)
-            next translate_enum(name, value) if value.present?
+            next translate_enum(value) if value.present?
 
             ' - '
           end
@@ -42,10 +42,6 @@ module RailsAdmin
 
           def form_value
             enum[super] || super
-          end
-
-          def translate_enum(name, key)
-            I18n.t("admin.models.#{abstract_model.to_param}.enums.#{name}.#{key}", default: key)
           end
         end
       end
