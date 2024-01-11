@@ -156,6 +156,10 @@ module RailsAdmin
           formatted_value.presence || ' - '
         end
 
+        register_instance_option :html_title do
+          bindings[:view].strip_tags(pretty_value.to_s)
+        end
+
         # output for printing in export view (developers beware: no bindings[:view] and no data!)
         register_instance_option :export_value do
           pretty_value
