@@ -53,6 +53,9 @@
 
 <div id="list">
   <%= form_tag(url_for(params.except(*%w[page f query]).merge(action: :index)), method: :get) do %>
+    <% if params[:scope].present? %>
+      <input name="scope" type="hidden" value="<%= params[:scope] %>" />
+    <% end %>
     <div class="card mb-3 p-3 bg-light">
       <div class="row" data-options="<%= ordered_filter_options.to_json %>" id="filters_box"></div>
       <hr class="filters_box" style="display:<%= ordered_filters.empty? ? 'none' : 'block' %>"/>
