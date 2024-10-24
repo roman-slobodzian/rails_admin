@@ -151,8 +151,8 @@ module RailsAdmin
           end
         end
 
-        def build
-          scope = @scope.where(@statements.join(' OR '), *@values)
+        def build(operator = 'OR')
+          scope = @scope.where(@statements.join(" #{operator} "), *@values)
           scope = scope.references(*@tables.uniq) if @tables.any?
           scope
         end
@@ -181,9 +181,10 @@ module RailsAdmin
             field = fields.detect { |f| f.name.to_s == field_name }
             value = parse_field_value(field, filter_dump[:v])
 
-            wb.add(field, value, (filter_dump[:o] || RailsAdmin::Config.default_search_operator))
+            search_operator = filter_dump[:o] || RailsAdmin::Config.default_search_operator
+            wb.add(field, value, search_operator)
             # AND current filter statements to other filter statements
-            scope = wb.build
+            scope = wb.build(search_operator == 'not_like' ? 'AND' : 'OR')
           end
         end
         scope
