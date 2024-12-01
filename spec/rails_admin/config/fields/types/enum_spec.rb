@@ -7,9 +7,12 @@ RSpec.describe RailsAdmin::Config::Fields::Types::Enum do
 
   subject { RailsAdmin.config(Team).field(:color) }
 
+  let(:enum_array) { %w[blue green red] }
+  let(:enum_select_options) { enum_array.to_h { |key| [key, key] } }
+
   describe "when object responds to '\#{method}_enum'" do
     before do
-      allow_any_instance_of(Team).to receive(:color_enum).and_return(%w[blue green red])
+      allow_any_instance_of(Team).to receive(:color_enum).and_return(enum_array)
       RailsAdmin.config Team do
         edit do
           field :color
@@ -20,13 +23,13 @@ RSpec.describe RailsAdmin::Config::Fields::Types::Enum do
     it 'auto-detects enumeration' do
       is_expected.to be_a(RailsAdmin::Config::Fields::Types::Enum)
       is_expected.not_to be_multiple
-      expect(subject.with(object: Team.new).enum).to eq %w[blue green red]
+      expect(subject.with(object: Team.new).enum).to eq enum_select_options
     end
   end
 
   describe "when class responds to '\#{method}_enum'" do
     before do
-      allow(Team).to receive(:color_enum).and_return(%w[blue green red])
+      allow(Team).to receive(:color_enum).and_return(enum_array)
       Team.instance_eval do
         def color_enum
           %w[blue green red]
@@ -41,7 +44,7 @@ RSpec.describe RailsAdmin::Config::Fields::Types::Enum do
 
     it 'auto-detects enumeration' do
       is_expected.to be_a(RailsAdmin::Config::Fields::Types::Enum)
-      expect(subject.with(object: Team.new).enum).to eq %w[blue green red]
+      expect(subject.with(object: Team.new).enum).to eq enum_select_options
     end
   end
 
@@ -65,7 +68,7 @@ RSpec.describe RailsAdmin::Config::Fields::Types::Enum do
 
     it 'allows configuration' do
       is_expected.to be_a(RailsAdmin::Config::Fields::Types::Enum)
-      expect(subject.with(object: Team.new).enum).to eq %w[blue green red]
+      expect(subject.with(object: Team.new).enum).to eq enum_select_options
     end
   end
 
@@ -89,7 +92,7 @@ RSpec.describe RailsAdmin::Config::Fields::Types::Enum do
 
     it 'allows configuration' do
       is_expected.to be_a(RailsAdmin::Config::Fields::Types::Enum)
-      expect(subject.with(object: Team.new).enum).to eq %w[blue green red]
+      expect(subject.with(object: Team.new).enum).to eq enum_select_options
     end
   end
 
@@ -143,7 +146,7 @@ RSpec.describe RailsAdmin::Config::Fields::Types::Enum do
 
   describe 'when serialize is enabled in Mongoid model', mongoid: true do
     before do
-      allow(Team).to receive(:color_enum).and_return(%w[blue green red])
+      allow(Team).to receive(:color_enum).and_return(enum_array)
       Team.instance_eval do
         field :color, type: Array
       end

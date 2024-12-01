@@ -21,5 +21,9 @@
       }
     }
   %>
-  <%= form.select field.method_name, field.enum, { selected: field.form_value, object: form.object }, field.html_attributes.reverse_merge({data: { filteringmultiselect: true, options: js_data.to_json }, multiple: true}) %>
+  <div class="row">
+    <div class="col-auto">
+      <%= form.select field.method_name, field.enum, { selected: field.form_value, object: form.object }, field.html_attributes.reverse_merge({data: { filteringmultiselect: true, options: js_data.to_json }, multiple: true}) %>
+    </div>
+  </div>
 <% end %>

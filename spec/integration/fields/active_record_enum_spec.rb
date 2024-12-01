@@ -25,7 +25,7 @@ RSpec.describe 'ActiveRecordEnum field', type: :request, active_record: true do
 
     it 'shows current value as selected' do
       visit edit_path(model_name: 'field_test', id: FieldTest.create(string_enum_field: 'L'))
-      expect(find('.enum_type select').value).to eq 'l'
+      expect(find('.enum_type select').value).to eq 'L'
     end
 
     it 'can be updated' do
@@ -37,7 +37,7 @@ RSpec.describe 'ActiveRecordEnum field', type: :request, active_record: true do
 
     it 'pre-populates default value' do
       visit new_path(model_name: 'field_test')
-      expect(find('.enum_type select').value).to eq 'm'
+      expect(find('.enum_type select').value).to eq 'M'
     end
   end
 
@@ -61,7 +61,7 @@ RSpec.describe 'ActiveRecordEnum field', type: :request, active_record: true do
 
     it 'shows current value as selected' do
       visit edit_path(model_name: 'field_test', id: FieldTest.create(integer_enum_field: :large))
-      expect(find('.enum_type select').value).to eq '2'
+      expect(find('.enum_type select').value).to eq 'large'
     end
 
     it 'can be updated' do
@@ -73,7 +73,7 @@ RSpec.describe 'ActiveRecordEnum field', type: :request, active_record: true do
 
     it 'pre-populates default value' do
       visit new_path(model_name: 'field_test')
-      expect(find('.enum_type select').value).to eq '1'
+      expect(find('.enum_type select').value).to eq 'medium'
     end
   end
 end

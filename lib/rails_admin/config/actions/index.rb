@@ -21,6 +21,17 @@ module RailsAdmin
         end
 
         register_instance_option :breadcrumb_parent do
+          if bindings[:controller].params[:owner_model_name] && bindings[:abstract_model].try(:config).try(:owner_relation)
+            actions = RailsAdmin::Config::Actions.all(
+              :all,
+              controller: bindings[:controller], abstract_model: bindings[:controller].owner_abstract_model,
+              object: bindings[:controller].owner_object
+            ).to_h { |action| [action.key, action] }
+            next [:show, bindings[:controller].owner_abstract_model, bindings[:controller].owner_object] if actions[:show]
+            next [:edit, bindings[:controller].owner_abstract_model, bindings[:controller].owner_object] if actions[:edit]
+            next [:list, bindings[:controller].owner_abstract_model] if actions[:list]
+          end
+
           parent_model = bindings[:abstract_model].try(:config).try(:parent)
           am = parent_model && RailsAdmin.config(parent_model).try(:abstract_model)
           if am
@@ -33,6 +44,8 @@ module RailsAdmin
         register_instance_option :controller do
           proc do
             @objects ||= list_entries
+            list_section = @model_config.list.with(controller: self)
+            @objects = list_section.instance_exec(@objects, &list_section.scope)
 
             unless @model_config.list.scopes.empty?
               if params[:scope].blank?
@@ -58,7 +71,7 @@ module RailsAdmin
                   end
 
                 if params[:send_data]
-                  send_data output, filename: "#{params[:model_name]}_#{DateTime.now.strftime('%Y-%m-%d_%Hh%Mm%S')}.json"
+                  send_data output, filename: "#{model_config.export.with(controller: self).filename}.json"
                 else
                   render json: output, root: false
                 end
@@ -67,7 +80,7 @@ module RailsAdmin
               format.xml do
                 output = @objects.to_xml(@schema)
                 if params[:send_data]
-                  send_data output, filename: "#{params[:model_name]}_#{DateTime.now.strftime('%Y-%m-%d_%Hh%Mm%S')}.xml"
+                  send_data output, filename: "#{model_config.export.with(controller: self).filename}.xml"
                 else
                   render xml: output
                 end
@@ -78,7 +91,7 @@ module RailsAdmin
                 if params[:send_data]
                   send_data output,
                             type: "text/csv; charset=#{encoding}; #{'header=present' if header}",
-                            disposition: "attachment; filename=#{params[:model_name]}_#{DateTime.now.strftime('%Y-%m-%d_%Hh%Mm%S')}.csv"
+                            disposition: "attachment; filename=#{model_config.export.with(controller: self).filename}.csv"
                 else
                   render plain: output
                 end

@@ -143,7 +143,12 @@ module RailsAdmin
           elsif collection?
             [:index, bindings[:abstract_model]]
           elsif member?
-            [:show, bindings[:abstract_model], bindings[:object]]
+            show_action = RailsAdmin::Config::Actions.find(:show, **bindings.slice(:controller, :abstract_model, :object))
+            if show_action
+              [:show, bindings[:abstract_model], bindings[:object]]
+            else
+              [:index, bindings[:abstract_model]]
+            end
           end
         end
 

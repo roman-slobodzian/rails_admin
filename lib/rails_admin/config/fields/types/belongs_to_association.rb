@@ -33,6 +33,14 @@ module RailsAdmin
             true
           end
 
+          register_instance_option :remote_source_params do
+            {}
+          end
+
+          register_instance_option :auto_select_first_option do
+            false
+          end
+
           def selected_id
             bindings[:object].safe_send(association.key_accessor)
           end

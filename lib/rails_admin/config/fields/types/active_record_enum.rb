@@ -14,11 +14,16 @@ module RailsAdmin
           end
 
           register_instance_option :enum do
-            abstract_model.model.defined_enums[name.to_s]
+            abstract_model.model.defined_enums[name.to_s].to_h do |key|
+              [translate_enum(key), key]
+            end
           end
 
           register_instance_option :pretty_value do
-            bindings[:object].send(name).presence || ' - '
+            value = bindings[:object].send(name)
+            next translate_enum(value) if value.present?
+
+            ' - '
           end
 
           register_instance_option :multiple? do
@@ -35,25 +40,8 @@ module RailsAdmin
             abstract_model.model.attribute_types[name.to_s].serialize(value)
           end
 
-          def parse_input(params)
-            value = params[name]
-            return unless value
-
-            params[name] = parse_input_value(value)
-          end
-
           def form_value
             enum[super] || super
-          end
-
-        private
-
-          def parse_input_value(value)
-            abstract_model.model.attribute_types[name.to_s].deserialize(value)
-          end
-
-          def type_cast_value(value)
-            abstract_model.model.column_types[name.to_s].type_cast_from_user(value)
           end
         end
       end

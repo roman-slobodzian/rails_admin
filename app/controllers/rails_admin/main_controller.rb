@@ -17,8 +17,17 @@ module RailsAdmin
       scope = model_config.scope
       auth_scope = @authorization_adapter&.query(auth_scope_key, model_config.abstract_model)
       scope = scope.merge(auth_scope) if auth_scope
+      scope = add_owner_scope(scope, model_config)
       scope = scope.instance_eval(&additional_scope) if additional_scope
       get_collection(model_config, scope, pagination)
+    end
+
+    def owner_object
+      @owner_object ||= owner_abstract_model.get(params[:owner_id], owner_abstract_model.config.scope)
+    end
+
+    def owner_abstract_model
+      @owner_abstract_model ||= RailsAdmin::AbstractModel.new(to_model_name(params[:owner_model_name]))
     end
 
   private
@@ -56,7 +65,7 @@ module RailsAdmin
     end
 
     def back_or_index
-      allowed_return_to?(params[:return_to].to_s) ? params[:return_to] : index_path
+      allowed_return_to?(params[:return_to].to_s) ? params[:return_to] : url_for(action: :index)
     end
 
     def allowed_return_to?(url)
@@ -82,9 +91,9 @@ module RailsAdmin
     def redirect_to_on_success
       notice = I18n.t('admin.flash.successful', name: @model_config.label, action: I18n.t("admin.actions.#{@action.key}.done"))
       if params[:_add_another]
-        redirect_to new_path(return_to: params[:return_to]), flash: {success: notice}
+        redirect_to url_for(action: :new, return_to: params[:return_to]), flash: {success: notice}
       elsif params[:_add_edit]
-        redirect_to edit_path(id: @object.id, return_to: params[:return_to]), flash: {success: notice}
+        redirect_to url_for(action: :edit, id: @object.id, return_to: params[:return_to]), flash: {success: notice}
       else
         redirect_to back_or_index, flash: {success: notice}
       end
@@ -148,6 +157,18 @@ module RailsAdmin
       action = params[:current_action].in?(%w[create update]) ? params[:current_action] : 'edit'
       @association = source_model_config.send(action).fields.detect { |f| f.name == params[:associated_collection].to_sym }.with(controller: self, object: source_object)
       @association.associated_collection_scope
+    end
+
+    def add_owner_scope(scope, model_config)
+      return scope if params[:owner_model_name].blank? || model_config.try(:owner_relation).to_s != params[:owner_model_name]
+
+      model_config.abstract_model.model.where(model_config.owner_relation => params[:owner_id])
+    end
+
+    def assign_owner_relation(object = @object)
+      return unless abstract_model.config.try(:owner_relation)
+
+      object.assign_attributes(abstract_model.config.try(:owner_relation) => owner_object)
     end
   end
 end

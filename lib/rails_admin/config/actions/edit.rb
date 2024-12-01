@@ -29,7 +29,7 @@ module RailsAdmin
               @object.assign_attributes(params[@abstract_model.param_key])
               @authorization_adapter&.authorize(:update, @abstract_model, @object)
               changes = @object.changes
-              if @object.save
+              if @model_config.updater_service.with(object: @object).execute
                 @auditing_adapter&.update_object(@object, @abstract_model, _current_user, changes)
                 respond_to do |format|
                   format.html { redirect_to_on_success }
